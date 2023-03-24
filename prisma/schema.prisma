@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DEV_DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model ad {
+  id             Int          @id @default(autoincrement())
+  origin         origin       @relation(fields: [originId], references: [id])
+  originId       Int          @unique(map: "originId")
+  building       building     @relation(fields: [buildingId], references: [id])
+  buildingId     Int
+  photo          photo[]
+  url            String       @unique(map: "url") @db.VarChar(255)
+  theirId        Int
+  roomQty        Int
+  totalArea      Float        @db.Float
+  atFloor        Int
+  price          Float        @db.Float
+  currency       ads_currency
+  readyForLiving Boolean
+
+  @@index([buildingId])
+}
+
+model building {
+  id          Int    @id @default(autoincrement())
+  ads         ad[]
+  country     String @db.VarChar(255)
+  city        String @db.VarChar(255)
+  street      String @db.VarChar(255)
+  houseNumber String @db.VarChar(255)
+  lat         Float  @db.Float
+  lon         Float  @db.Float
+  geojson     Json
+  maxFloors   Int?
+}
+
+model model {
+  id          Int     @id @default(autoincrement())
+  name        String? @unique(map: "name") @db.VarChar(255)
+  description String? @db.VarChar(255)
+  photoFeature photoFeature[]
+}
+
+model origin {
+  id   Int    @id @default(autoincrement())
+  name String @unique(map: "name") @db.VarChar(255)
+  url  String @unique(map: "url") @db.VarChar(255)
+  ads  ad[]
+}
+
+model photoFeature {
+  photo    photo @relation(fields: [photoId], references: [id])
+  photoId  Int
+  model    model @relation(fields: [modelId], references: [id])
+  modelId  Int
+  version  Int
+  features Json?
+
+  @@id([photoId, modelId, version])
+  @@index([photoId])
+  @@index([modelId])
+}
+
+model photo {
+  id   Int    @id @default(autoincrement())
+  key  String @unique(map: "key") @db.VarChar(255)
+  ad   ad @relation(fields: [adId], references: [id])
+  adId Int
+  photoFeature photoFeature[]
+
+  @@index([adId])
+}
+
+enum ads_currency {
+  UAH
+  USD
+  EUR
+}
