@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",
+    "dotenv": "^16.0.3",
     "telegram": "^2.15.10"
   }
 }
