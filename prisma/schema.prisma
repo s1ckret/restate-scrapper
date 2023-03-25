@@ -16,6 +16,8 @@ model ad {
   buildingId     Int
   photo          photo[]
   url            String       @unique(map: "url") @db.VarChar(255)
+  title          String       @db.VarChar(255)
+  description    String       @db.Text
   theirId        Int
   roomQty        Int
   totalArea      Float        @db.Float
