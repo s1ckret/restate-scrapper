@@ -1,4 +1,4 @@
-import { TelegramClient } from "telegram";
+import { TelegramClient, Api } from "telegram";
 import {
   TELEGRAM_API_ID,
   TELEGRAM_API_HASH,
@@ -9,6 +9,9 @@ import {
 import * as readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { Interface } from "node:readline";
+import { extractMessageMetadata } from "./messageMetadataExtracter";
+import { parseMessageBody } from "./messageBodyParser";
+import { scrapeWebpage } from "./messageWebPageScrapper";
 
 async function main() {
   const rl = readline.createInterface({ input, output });
@@ -38,7 +41,8 @@ async function main() {
 
   for await (const message of client.iterMessages(channel, {
     offsetDate: fromDate,
-    reverse: true
+    reverse: true,
+    limit: 5
   })) {
     if (message.date > toDate) {
       console.log(
@@ -47,15 +51,23 @@ async function main() {
       shutdown(client, rl);
       return 0;
     }
-    // Extract message features
-    // Geolocate the building
-    // Open telegraph link with something like bs4
-    // Fetch description
-    // Download all photos
-    // Upload all photos to S3 (save those urls)
-    // Save building to a database
-    // Save ad to a database
-    // Save photos to a database
+    try {
+      const metadata = extractMessageMetadata(message);
+      const messageBodyFeatures = parseMessageBody(message.text);
+      const [title, imageUrls] = await scrapeWebpage(metadata.webpageUrl);
+      console.log(metadata);
+      console.log(messageBodyFeatures);
+      console.log(title);
+      console.log(imageUrls);
+      // Geolocate the building
+      // Download all photos
+      // Upload all photos to S3 (save those urls)
+      // Save building to a database
+      // Save ad to a database
+      // Save photos to a database
+    } catch (e) {
+      console.error(e);
+    }
   }
   shutdown(client, rl);
 }
