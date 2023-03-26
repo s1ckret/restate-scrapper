@@ -12,6 +12,7 @@ import { Interface } from "node:readline";
 import { extractMessageMetadata } from "./messageMetadataExtracter";
 import { parseMessageBody } from "./messageBodyParser";
 import { scrapeWebpage } from "./messageWebPageScrapper";
+import { geocode } from "./geocoder";
 
 async function main() {
   const rl = readline.createInterface({ input, output });
@@ -42,7 +43,7 @@ async function main() {
   for await (const message of client.iterMessages(channel, {
     offsetDate: fromDate,
     reverse: true,
-    limit: 5
+    limit: 2
   })) {
     if (message.date > toDate) {
       console.log(
@@ -55,18 +56,22 @@ async function main() {
       const metadata = extractMessageMetadata(message);
       const messageBodyFeatures = parseMessageBody(message.text);
       const [title, imageUrls] = await scrapeWebpage(metadata.webpageUrl);
-      console.log(metadata);
+      const geocodingResult = await geocode(
+        messageBodyFeatures.street,
+        messageBodyFeatures.houseNumber
+      );
       console.log(messageBodyFeatures);
-      console.log(title);
-      console.log(imageUrls);
-      // Geolocate the building
+      console.log(geocodingResult);
+
       // Download all photos
       // Upload all photos to S3 (save those urls)
       // Save building to a database
       // Save ad to a database
       // Save photos to a database
     } catch (e) {
-      console.error(e);
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
     }
   }
   shutdown(client, rl);
