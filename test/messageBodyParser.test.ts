@@ -1,6 +1,6 @@
 import { ParsedMessageBody, parseMessageBody } from "../src/messageBodyParser";
 
-const messageBody1 = `⚡️337209 (https://t.me/iv?url=https://kvartirant.x-estate.app/kharkiv/advertisements/337209/preview&rhash=4b483bd9f88369)
+const messageBody1 = `⚡️337209
 🔑2к
 ✏️75.0м²
 🔺Поверх: 1/2 ⚠️
@@ -26,7 +26,7 @@ const messageBodyParsed1: ParsedMessageBody = {
   readyForLiving: true
 };
 
-const messageBody2 = `⚡️224614 (https://telegra.ph/224614-Prodayotsya-1-komnatnaya-kvartira-Centr-07-17)
+const messageBody2 = `⚡️224614
 🔑1к
 ✏️42.43м²
 🔺Этаж: 5/10
@@ -51,8 +51,7 @@ const messageBodyParsed2: ParsedMessageBody = {
   readyForLiving: false
 };
 
-const messageBodyMissingId = ` (https://t.me/iv?url=https://kvartirant.x-estate.app/kharkiv/advertisements/337209/preview&rhash=4b483bd9f88369)
-🔑2к
+const messageBodyMissingId = `🔑2к
 ✏️75.0м²
 🔺Поверх: 1/2 ⚠️
 📍Салтівка, ЖК Парус, вул. Барабашова 36а
@@ -62,7 +61,7 @@ const messageBodyMissingId = ` (https://t.me/iv?url=https://kvartirant.x-estate.
 #Салтівка2к
 #Салтівка2кНовострой`;
 
-const messageBodyMissingArea = `⚡️337209 (https://t.me/iv?url=https://kvartirant.x-estate.app/kharkiv/advertisements/337209/preview&rhash=4b483bd9f88369)
+const messageBodyMissingArea = `⚡️337209
 🔑2к
 ✏️
 🔺Поверх: 1/2 ⚠️
@@ -73,7 +72,7 @@ const messageBodyMissingArea = `⚡️337209 (https://t.me/iv?url=https://kvarti
 #Салтівка2к
 #Салтівка2кНовострой`;
 
-const messageBodyHouseNumber = `⚡️337209 (https://t.me/iv?url=https://kvartirant.x-estate.app/kharkiv/advertisements/337209/preview&rhash=4b483bd9f88369)
+const messageBodyHouseNumber = `⚡️337209
 🔑2к
 ✏️75.0м²
 🔺Поверх: 1/2 ⚠️
@@ -98,13 +97,13 @@ describe("message body parser", () => {
   );
 
   it.each([
-    [messageBodyMissingId, new Error("ID not found")],
-    [messageBodyMissingArea, new Error("Area not found")],
-    [messageBodyHouseNumber, new Error("Street information not found")]
+    [messageBodyMissingId, "ID not found"],
+    [messageBodyMissingArea, "Area not found"],
+    [messageBodyHouseNumber, "Street information not found"]
   ])(
     "should throw Error because some feature is missing for message %p",
-    (messageBody: string, error: Error) => {
-      expect(() => parseMessageBody(messageBody)).toThrowError(error);
+    (messageBody: string, error: string) => {
+      expect(() => parseMessageBody(messageBody)).toThrow(error);
     }
   );
 });

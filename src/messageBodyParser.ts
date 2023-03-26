@@ -1,7 +1,7 @@
 function extractId(text: string): number {
   const match = text.match(/⚡️(\d*)/);
   if (!match) {
-    throw new Error("ID not found");
+    throw new Error(`ID not found in ${text}`);
   }
   return parseInt(match[1]);
 }
@@ -12,7 +12,7 @@ function extractRoomQty(text: string): number {
   }
   const match = text.match(/([1-9])к/);
   if (!match) {
-    throw new Error("Room quantity not found");
+    throw new Error(`Room quantity not found in ${text}`);
   }
   return parseInt(match[1]);
 }
@@ -20,7 +20,7 @@ function extractRoomQty(text: string): number {
 function extractArea(text: string): number {
   const match = text.match(/([\d.]*)м²/);
   if (!match) {
-    throw new Error("Area not found");
+    throw new Error(`Area not found in ${text}`);
   }
   return parseFloat(match[1]);
 }
@@ -28,7 +28,7 @@ function extractArea(text: string): number {
 function extractFloor(text: string): [number, number] {
   const match = text.match(/(Поверх: |Этаж: )(\d*)\/(\d*)/);
   if (!match) {
-    throw new Error("Floor information not found");
+    throw new Error(`Floor information not found in ${text}`);
   }
   return [parseInt(match[2]), parseInt(match[3])];
 }
@@ -36,17 +36,17 @@ function extractFloor(text: string): [number, number] {
 function extractPrice(text: string): [number, string] {
   const match = text.match(/(\d*) ([$€]|грн)/);
   if (!match) {
-    throw new Error("Price not found");
+    throw new Error(`Price not found in ${text}`);
   }
   return [parseInt(match[1]), match[2]];
 }
 
 function extractStreet(text: string): [string, string] {
   const match = text.match(
-    /((пр\.|ул\.|пер\.|вул\.)([\p{L} -]{1,}))([\d][\d\p{L}/\-.]*)/u
+    /((пр\.|ул\.|пер\.|вул\.|пров\.)([\p{L} -]{1,}))([\d][\d\p{L}/\-.]*)/u
   );
   if (!match) {
-    throw new Error("Street information not found");
+    throw new Error(`Street information not found in ${text}`);
   }
   return [match[3].trim(), match[4].trim()];
 }
@@ -74,6 +74,7 @@ export interface ParsedMessageBody {
 }
 
 export function parseMessageBody(text: string): ParsedMessageBody {
+  text = text.replaceAll("\n", " | ");
   const id: number = extractId(text);
   const roomQty: number = extractRoomQty(text);
   const area: number = extractArea(text);
