@@ -43,7 +43,7 @@ function extractPrice(text: string): [number, string] {
 
 function extractStreet(text: string): [string, string] {
   const match = text.match(
-    /((пр\.|ул\.|пер\.|вул\.|пров\.)([\p{L} -]{1,}))([\d][\d\p{L}/\-.]*)/u
+    /((пр|ул|пер|вул|пров|бульв)[.\s]{1,}([\p{L}\d\s'-]{1,}))[,\s]{1,}([\d][\d\p{L}/\-.]*)/u
   );
   if (!match) {
     throw new Error(`Street information not found in ${text}`);
