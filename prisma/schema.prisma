@@ -13,6 +13,8 @@ model ad {
   origin         origin       @relation(fields: [originId], references: [id])
   originId       Int          @unique(map: "originId")
   building       building     @relation(fields: [buildingId], references: [id])
+  postedAtSec    Int
+  foundAtSec     Int
   buildingId     Int
   photo          photo[]
   url            String       @unique(map: "url") @db.VarChar(255)
@@ -31,6 +33,7 @@ model ad {
 
 model building {
   id          Int    @id @default(autoincrement())
+  osmId       Int    @unique(map: "osmId")
   ads         ad[]
   country     String @db.VarChar(255)
   city        String @db.VarChar(255)
