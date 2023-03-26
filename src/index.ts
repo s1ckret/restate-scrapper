@@ -6,7 +6,9 @@ import {
   FROM_DATE,
   TO_DATE,
   APPLICATION_NAME,
-  AWS_S3_BUCKET_NAME
+  AWS_S3_BUCKET_NAME,
+  SLEEP_BETWEEN_DAYS_MS,
+  SLEEP_BETWEEN_MESSAGES_MS
 } from "./config";
 import * as readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
@@ -20,6 +22,7 @@ import { geocode, GeocodeResult } from "./geocoder";
 import { downloadImages } from "./imageDownloader";
 import { uploadImages } from "./imageUploader";
 import { ads_currency, PrismaClient } from "@prisma/client";
+import { sleep } from "telegram/Helpers";
 const rl = readline.createInterface({ input, output });
 
 const client = new TelegramClient(
@@ -45,16 +48,21 @@ async function main() {
 
   const fromDate = toUnixTimestamp(new Date(FROM_DATE));
   const toDate = toUnixTimestamp(new Date(TO_DATE));
+  let nextDayDate = fromDate + 86400;
 
   const parameters = {
     offsetDate: fromDate,
-    reverse: true,
-    limit: 1
+    reverse: true
   };
   for await (const message of client.iterMessages(channel, parameters)) {
     if (message.date > toDate) {
       console.log(`Message is older '${message.date}' than - '${toDate}'`);
       return 0;
+    }
+    if (message.date > nextDayDate) {
+      console.log(`Scrapped all messages for '${new Date(nextDayDate)}'`);
+      nextDayDate += 86400;
+      await sleep(SLEEP_BETWEEN_DAYS_MS);
     }
     try {
       const metadata = extractMessageMetadata(message);
@@ -94,14 +102,14 @@ async function main() {
       );
 
       console.log(`Saved ad with their ID: ${features.sourceId}`);
-      // wait between messages
-      // wait between days
+      sleep(SLEEP_BETWEEN_MESSAGES_MS);
     } catch (e) {
       if (e instanceof Error) {
         console.error(e.message);
       }
     }
   }
+  console.log(`Read all recent messages till ${new Date(TO_DATE)}!`);
 }
 
 async function saveAdToDb(

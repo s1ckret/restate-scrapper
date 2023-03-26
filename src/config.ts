@@ -11,3 +11,9 @@ export const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME as string;
 export const APPLICATION_NAME = process.env.APPLICATION_NAME as string;
 export const FROM_DATE = process.env.FROM_DATE as string;
 export const TO_DATE = process.env.TO_DATE as string;
+export const SLEEP_BETWEEN_MESSAGES_MS = parseInt(
+  process.env.SLEEP_BETWEEN_MESSAGES_MS as string
+);
+export const SLEEP_BETWEEN_DAYS_MS = parseInt(
+  process.env.SLEEP_BETWEEN_DAYS_MS as string
+);
