@@ -11,7 +11,7 @@ datasource db {
 model ad {
   id             Int          @id @default(autoincrement())
   origin         origin       @relation(fields: [originId], references: [id])
-  originId       Int          @unique(map: "originId")
+  originId       Int          
   building       building     @relation(fields: [buildingId], references: [id])
   postedAtSec    Int
   foundAtSec     Int
@@ -20,7 +20,7 @@ model ad {
   url            String       @unique(map: "url") @db.VarChar(255)
   title          String       @db.VarChar(255)
   description    String       @db.Text
-  theirId        Int
+  theirId        Int          @unique(map: "theirId")
   roomQty        Int
   totalArea      Float        @db.Float
   atFloor        Int
@@ -75,7 +75,7 @@ model photoFeature {
 model photo {
   id   Int    @id @default(autoincrement())
   key  String @unique(map: "key") @db.VarChar(255)
-  ad   ad @relation(fields: [adId], references: [id])
+  ad   ad     @relation(fields: [adId], references: [id])
   adId Int
   photoFeature photoFeature[]
 
